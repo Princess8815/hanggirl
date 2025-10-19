@@ -1,0 +1,62 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 2em;
+}
+
+h1 {
+  font-size: 2.2em;
+  margin-bottom: 0.5em;
+}
+
+#word {
+  font-size: 2em;
+  letter-spacing: 10px;
+  margin: 1em 0;
+}
+
+#letters button {
+  background: white;
+  border: none;
+  color: #ff1493;
+  font-weight: bold;
+  font-size: 1.2em;
+  margin: 5px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#letters button:disabled {
+  background: #aaa;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+#message {
+  font-size: 1.5em;
+  margin-top: 1em;
+}
+
+#reset {
+  background: white;
+  border: none;
+  color: #ff1493;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 10px 20px;
+  margin-top: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#hangman {
+  font-family: monospace;
+  white-space: pre;
+  font-size: 1.1em;
+  margin-top: 20px;
+}
