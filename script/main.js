@@ -17,15 +17,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let words = []; // Will load from Firestore
-let wins = parseInt(localStorage.getItem("wins")) || 0;
-let losses = parseInt(localStorage.getItem("losses")) || 0;
+// --- Local storage handling ---
+let wins = localStorage.getItem("wins");
+let losses = localStorage.getItem("losses");
+wins = wins !== null ? parseInt(wins) : 0;
+losses = losses !== null ? parseInt(losses) : 0;
+
+// --- Game state ---
+let words = [];
 let chosenWord = "";
 let displayWord = [];
 let attempts = 0;
 const maxAttempts = 6;
 
-// --- Load words from Firestore before starting the game ---
+// --- Load words from Firestore ---
 async function loadWords() {
   try {
     console.log("📡 Fetching words from Firestore...");
@@ -35,19 +40,19 @@ async function loadWords() {
     if (snap.exists()) {
       words = snap.data().list;
       console.log(`✅ Loaded ${words.length} words from Firestore.`);
-      startGame();
     } else {
-      console.error("❌ No words document found in Firestore.");
-      words = ["fallback", "test", "error"]; // just in case
-      startGame();
+      console.warn("⚠️ No words document found, using fallback.");
+      words = ["fallback", "test", "error"];
     }
   } catch (err) {
     console.error("🔥 Error fetching words:", err);
     words = ["offline", "test", "error"];
-    startGame();
   }
+
+  startGame(); // ✅ always start game after words loaded
 }
 
+// --- Game Logic ---
 function drawHangman(stage) {
   const parts = [
     `
@@ -111,6 +116,7 @@ function drawHangman(stage) {
 }
 
 function startGame() {
+  if (!words.length) return console.error("⚠️ No words loaded yet!");
   chosenWord = words[Math.floor(Math.random() * words.length)].toUpperCase();
   displayWord = Array(chosenWord.length).fill("_");
   attempts = 0;
@@ -119,6 +125,7 @@ function startGame() {
   document.getElementById("reset").style.display = "none";
   updateWordDisplay();
   createLetterButtons();
+  updateScoreDisplay();
 }
 
 function updateWordDisplay() {
@@ -164,20 +171,26 @@ function guess(letter, button) {
     document.getElementById("message").textContent = `💀 You lose! The word was ${chosenWord}.`;
     losses++;
     localStorage.setItem("losses", losses);
-
     endGame();
   }
+
   updateScoreDisplay();
 }
 
 function endGame() {
-  document.querySelectorAll("#letters button").forEach(b => b.disabled = true);
+  document.querySelectorAll("#letters button").forEach(b => (b.disabled = true));
   document.getElementById("reset").style.display = "inline-block";
 }
 
+// --- UI Updates ---
 function updateScoreDisplay() {
   document.getElementById("score").textContent = `🏆 Wins: ${wins} | 💀 Losses: ${losses}`;
 }
 
+// --- Hook up the Play Again button ---
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("reset").addEventListener("click", startGame);
+  loadWords();
+});
 
-loadWords();
+
