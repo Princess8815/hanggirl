@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Append Words</title>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        updateDoc,
+        arrayUnion
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCIUd6ckCecFB7pqG82OptO_5GCuLPGAmY",
+        authDomain: "hanggirl-game.firebaseapp.com",
+        projectId: "hanggirl-game",
+        storageBucket: "hanggirl-game.appspot.com",
+        messagingSenderId: "671586933731",
+        appId: "1:671586933731:web:309592c8e03a58f9931ed6",
+        measurementId: "G-2WK4BRTVDK"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      async function appendWords(newWords) {
+        const ref = doc(db, "config", "words");
+        await updateDoc(ref, {
+          list: arrayUnion(...newWords)
+        });
+        console.log("✅ Added new words:", newWords);
+      }
+
+      // 🔹 Add your new words here
+const newWords = [];
+
+
+
+      appendWords(newWords).catch((err) => console.error("❌ Error:", err));
+    </script>
+  </head>
+  <body>
+    <h1>Appending new words… check console</h1>
+  </body>
+</html>

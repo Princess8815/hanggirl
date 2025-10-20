@@ -1,42 +1,52 @@
-const words = [
-  // Nature & Weather
-  "rainbow", "thunderstorm", "tornado", "hurricane", "sunshine", "avalanche", "earthquake", "blizzard", "forest", "meadow",
-  "mountain", "river", "ocean", "valley", "volcano", "desert", "island", "breeze", "tsunami", "lightning",
+// --- Firebase setup ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-  // Animals
-  "zebra", "tiger", "lion", "elephant", "giraffe", "kangaroo", "penguin", "dolphin", "whale", "falcon",
-  "panther", "cheetah", "rhino", "koala", "panda", "otter", "wolf", "fox", "rabbit", "swan",
+// Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCIUd6ckCecFB7pqG82OptO_5GCuLPGAmY",
+  authDomain: "hanggirl-game.firebaseapp.com",
+  projectId: "hanggirl-game",
+  storageBucket: "hanggirl-game.appspot.com",
+  messagingSenderId: "671586933731",
+  appId: "1:671586933731:web:309592c8e03a58f9931ed6",
+  measurementId: "G-2WK4BRTVDK"
+};
 
-  // Fantasy & Mythical
-  "dragon", "unicorn", "phoenix", "griffin", "mermaid", "centaur", "wizard", "sorceress", "princess", "castle",
-  "kingdom", "knight", "goblin", "troll", "fairy", "vampire", "werewolf", "witch", "crystal", "sword",
+// Initialize Firebase and Firestore
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  // Space & Sci-Fi
-  "galaxy", "nebula", "asteroid", "comet", "planet", "satellite", "starlight", "cosmos", "spaceship", "meteor",
-  "blackhole", "supernova", "astronaut", "gravity", "orbit", "quantum", "robot", "android", "teleport", "dimension",
-
-  // Technology
-  "javascript", "computer", "keyboard", "monitor", "internet", "software", "hardware", "programmer", "database", "encryption",
-  "network", "website", "algorithm", "compiler", "function", "variable", "console", "debugger", "interface", "binary",
-
-  // Emotions & Abstract
-  "courage", "hope", "friendship", "loyalty", "kindness", "bravery", "honesty", "compassion", "wisdom", "patience",
-  "freedom", "destiny", "truth", "faith", "justice", "love", "dream", "peace", "memory", "sacrifice",
-
-  // Food & Objects
-  "chocolate", "pumpkin", "strawberry", "cupcake", "pancake", "pizza", "sandwich", "icecream", "cookie", "donut",
-  "teapot", "blanket", "lantern", "backpack", "compass", "camera", "guitar", "umbrella", "notebook", "bicycle",
-
-  // Misc / Fun
-  "holiday", "festival", "adventure", "mystery", "journey", "treasure", "island", "pirate", "explorer", "voyage",
-  "rainbow", "sparkle", "dreamer", "whisper", "moonlight", "sunflower", "starship", "laughter", "midnight", "miracle"
-];
+let words = []; // Will load from Firestore
 let wins = parseInt(localStorage.getItem("wins")) || 0;
 let losses = parseInt(localStorage.getItem("losses")) || 0;
 let chosenWord = "";
 let displayWord = [];
 let attempts = 0;
 const maxAttempts = 6;
+
+// --- Load words from Firestore before starting the game ---
+async function loadWords() {
+  try {
+    console.log("📡 Fetching words from Firestore...");
+    const ref = doc(db, "config", "words");
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      words = snap.data().list;
+      console.log(`✅ Loaded ${words.length} words from Firestore.`);
+      startGame();
+    } else {
+      console.error("❌ No words document found in Firestore.");
+      words = ["fallback", "test", "error"]; // just in case
+      startGame();
+    }
+  } catch (err) {
+    console.error("🔥 Error fetching words:", err);
+    words = ["offline", "test", "error"];
+    startGame();
+  }
+}
 
 function drawHangman(stage) {
   const parts = [
@@ -170,4 +180,4 @@ function updateScoreDisplay() {
 }
 
 
-startGame();
+loadWords();

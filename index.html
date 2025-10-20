@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hanggirl Game</title>
   <link rel="stylesheet" href="styles/styles.css" />
-  <script src="script/main.js" defer></script>
+  <script type="module" src="script/main.js"></script>
 </head>
 <body>
   <h1>🎯 Hanggirl</h1>
@@ -19,3 +19,39 @@
   
 </body>
 </html>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCIUd6ckCecFB7pqG82OptO_5GCuLPGAmY",
+    authDomain: "hanggirl-game.firebaseapp.com",
+    projectId: "hanggirl-game",
+    storageBucket: "hanggirl-game.appspot.com",
+    messagingSenderId: "671586933731",
+    appId: "1:671586933731:web:309592c8e03a58f9931ed6",
+    measurementId: "G-2WK4BRTVDK"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+
+  // Example: load words from Firestore later
+  async function loadWords() {
+    const ref = doc(db, "config", "words");
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      window.words = snap.data().list;
+      console.log("Loaded words:", window.words);
+    } else {
+      console.error("No words document found!");
+    }
+  }
+
+  loadWords();
+</script>
